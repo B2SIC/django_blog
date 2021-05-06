@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Blog{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static '/blog/bootstrap/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static '/blog/_assets/css/custom.min.css' %}">
+    <script src="https://kit.fontawesome.com/4a055a8244.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+{% include 'basecamp/navbar.html' %}
+
+<div class="container">
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+
+            <!-- Blog Entries Column -->
+            <div class="col-md-8" id="main-div">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <!-- Sidebar Widgets Column -->
+            <div class="col-md-4" id="side_div">
+
+                <!-- Search Widget -->
+                <div class="card my-4">
+                    <h5 class="card-header">Search</h5>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" id="search-input" class="form-control" onkeyup="enter_key()" placeholder="Search for...">
+                            <span class="input-group-append">
+                <button class="btn btn-secondary" type="button" onclick="search_post()">Go!</button>
+              </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Widget -->
+                <div class="card my-4" id="category-card">
+                    <h5 class="card-header">Categories</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <ul class="list-unstyled mb-0">
+                                    {% for category in category_list %}
+                                        <li>
+                                            <a href="{{ category.get_absolute_url }}">{{ category.name }} ({{ category.post_set.count }})</a>
+                                        </li>
+                                    {% endfor %}
+                                    <li>
+                                        <a href="/blog/category/_none/">미분류 ({{ posts_without_category }})</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function search_post(){
+        var search_value = document.getElementById('search-input').value;
+        location.href='/blog/search/' + search_value + '/';
+        {#alert(search_value)#}
+    }
+
+    function enter_key(){
+        if (window.event.keyCode == 13){
+            search_post();
+        }
+    }
+
+</script>
+
+<script src="{% static '/blog/_assets/js/jquery.min.js' %}"></script>
+<script src="{% static '/blog/_assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static '/blog/_assets/js/custom.js' %}"></script>
+
+</body>
+</html>

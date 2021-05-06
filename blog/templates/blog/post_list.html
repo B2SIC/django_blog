@@ -1,0 +1,71 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <button type="button" style="margin-top: 10px" class="btn btn-outline-info btn-sm float-right" onclick="location.href='/blog/create/'">New Post</button>
+    {% endif %}
+    <h1 id="blog-list-title">
+        Blog
+        {% if category %}<small class="text-muted">: {{ category }}</small>{% endif %}
+        {% if tag %}<small class="text-muted">: #{{ tag }}</small>{% endif %}
+        {% if search_info %}<small class="text-muted">: #{{ search_info }} ({{ object_list.count }})</small>{% endif %}
+    </h1>
+
+    <!-- Blog Post -->
+    {% if object_list.exists %}
+        {% for p in object_list %}
+            <div class="card mb-4" id="post-card-{{ p.pk }}">
+                {% if p.head_image %}
+                    <img class="card-img-top" src="{{ p.head_image.url }}" alt="Card image cap">
+                {% else %}
+                    <img class="card-img-top" src="https://loremflickr.com/750/300" alt="Card image cap">
+                {% endif %}
+                <div class="card-body">
+                    {% if p.category %}
+                        <span class="badge bg-primary text-white float-right">{{ p.category }}</span>
+                    {% else %}
+                        <span class="badge bg-primary text-white float-right">미분류</span>
+                    {% endif %}
+                    <h2 class="card-title">{{ p.title }}</h2>
+                    <p class="card-text">{{ p.content | truncatewords:50 }}</p>
+                    {% for tag in p.tags.all %}
+                        <a href="{{ tag.get_absolute_url }}">#{{ tag }}</a>
+                    {% endfor %}
+                    <br>
+                    <br>
+                    <a href="{{ p.get_absolute_url }}" class="btn btn-primary" id="read-more-post-{{ p.pk }}">Read More &rarr;</a>
+                </div>
+                <div class="card-footer text-muted">
+                    Posted on {{ p.created }} by {{ p.author }}
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if is_paginated %}
+            <!-- Pagination -->
+            <ul class="pagination justify-content-center mb-4">
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">&larr; Older</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">&larr; Older</a>
+                    </li>
+                {% endif %}
+
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Newer &rarr;</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Newer &rarr;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    {% else %}
+        <h3>아직 게시물이 없습니다.</h3>
+    {% endif %}
+{% endblock %}

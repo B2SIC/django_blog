@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Blog{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static '/blog/bootstrap/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static '/blog/_assets/css/custom.min.css' %}">
+    <script src="https://kit.fontawesome.com/4a055a8244.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+{% include 'basecamp/navbar.html' %}
+
+{% block content %}
+{% endblock %}
+
+
+<script src="{% static '/blog/_assets/js/jquery.min.js' %}"></script>
+<script src="{% static '/blog/_assets/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static '/blog/_assets/js/custom.js' %}"></script>
+
+</body>
+</html>

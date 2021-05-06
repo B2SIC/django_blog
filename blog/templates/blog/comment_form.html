@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ object.title }} - Blog{% endblock %}
+
+{% block content %}
+    <form method="POST">{% csrf_token %}
+        <h3>Edit Comment</h3>
+        <hr>
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button type="submit" class="btn btn-outline-info float-right">Submit</button>
+    </form>
+    {{ form.media }}
+{% endblock %}

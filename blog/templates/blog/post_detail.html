@@ -1,0 +1,117 @@
+{% extends 'blog/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}{{ object.title }} - Blog{% endblock %}
+
+{% block content %}
+    <!-- Title -->
+    <h1 class="mt-4">{{ object.title }}</h1>
+
+    {% if object.category %}
+        <span class="badge bg-primary text-white float-right">{{ object.category }}</span>
+    {% else %}
+        <span class="badge bg-primary text-white float-right">미분류</span>
+    {% endif %}
+
+    <!-- Author -->
+    <p class="lead">
+        by
+        <a href="#">{{ object.author.username }}</a>
+    </p>
+
+    {% if request.user == object.author %}
+        <button type="button" style="margin-top: 10px" class="btn btn-outline-primary float-right" onclick="location.href='{{ object.get_update_url }}'">EDIT</button>
+    {% endif %}
+
+    <hr>
+
+    <!-- Date/Time -->
+    <p>Posted on {{ object.created }}</p>
+
+    <hr>
+
+    <!-- Preview Image -->
+    {% if object.head_image %}
+        <img class="img-fluid rounded" src="{{ object.head_image.url }}" alt="{{ object.title }}">
+        <hr>
+    {% endif %}
+
+
+
+    <!-- Post Content -->
+    {{ object.get_markdown_content | safe }}
+
+    <br>
+    <br>
+
+    {% for tag in object.tags.all %}
+        <a href="{{ tag.get_absolute_url }}">#{{ tag }}</a>
+    {% endfor %}
+
+    <br>
+    <!-- Comments Form -->
+    <div class="card my-4">
+        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-body">
+            {% if user.is_authenticated %}
+                <form method="post" action="{{ object.get_absolute_url }}new_comment/">{% csrf_token %}
+                <div class="form-group">
+                    {{ comment_form | crispy }}
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            {% else %}
+                <button type="button" class="btn btn-outline-dark btn-block" data-toggle="modal" data-target="#loginModal">
+                    Log in
+                </button>
+            {% endif %}
+            </form>
+
+
+        </div>
+    </div>
+
+    <div id="comment-list">
+        {% for comment in object.comment_set.all %}
+            <!-- Single Comment -->
+            <div class="media mb-4" id="comment-id-{{ comment.pk }}">
+                {% if comment.author.socialaccount_set.all.0.get_avatar_url %}
+                    <img width="50px" class="d-flex mr-3 rounded-circle" src="{{ comment.author.socialaccount_set.all.0.get_avatar_url }}" alt="">
+                {% else %}
+                    <img width="50px" class="d-flex mr-3 rounded-circle" src="https://i.pravatar.cc/150?u={{ comment.author }}@pravatar.com" alt="">
+                {% endif %}
+                <div class="media-body">
+                    {% if comment.author == request.user %}
+                        <button class="btn btn-outline-warning float-right" data-toggle="modal" data-target="#deleteCommentModal-{{ comment.pk }}">delete</button>
+                        <button class="btn btn-outline-info float-right" style="margin-right: 5px" onclick="location.href='/blog/edit_comment/{{ comment.pk }}/'">edit</button>
+                    {% endif %}
+                    <h5 class="mt-0">{{ comment.author }} <small class="text-muted">{{ comment.created_at }}</small></h5>
+                    {{ comment.get_markdown_content | safe }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% for comment in object.comment_set.all %}
+        {% if user == comment.author %}
+            <!-- Modal -->
+            <div class="modal fade" id="deleteCommentModal-{{ comment.pk }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">정말로 삭제하시겠습니까?</h5>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{ comment.get_markdown_content | safe}}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="location.href='/blog/delete_comment/{{ comment.pk }}/'">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

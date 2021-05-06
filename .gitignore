@@ -1,0 +1,9 @@
+# Settings
+venv/
+.idea/
+
+*.pyc
+db.sqlite3
+migrations/
+secrets.json
+/_media
